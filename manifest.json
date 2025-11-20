@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Canvas++",
+  "version": "1.0",
+  "description": "Fix carmen canvas",
+  "content_scripts": [
+    {
+      "js": ["content.js"],
+      "css": ["style.css"],
+      "matches": [
+        "https://osu.instructure.com/*"
+      ]
+    }
+  ]
+}
