@@ -211,12 +211,25 @@
     border-radius: 4px;
     font-weight: 700;
     font-size: 14px;
-    /* Changed from 20 to 1 to fix scrolling overlap issue */
+    text-decoration: none !important;
     z-index: 1; 
     box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     border: 1px solid rgba(0,0,0,0.1);
-    pointer-events: none; 
+    pointer-events: auto; /* Enable clicking */
+    cursor: pointer;
+    transition: transform 0.1s ease;
 }
+
+.canvas-pp-grade-badge:hover {
+    transform: scale(1.05);
+}
+
+/* Color Coding */
+.canvas-pp-grade-badge.grade-a { color: #008a00; } /* Green */
+.canvas-pp-grade-badge.grade-b { color: #008a00; } /* Greenish */
+.canvas-pp-grade-badge.grade-c { color: #e6a700; } /* Yellow/Orange */
+.canvas-pp-grade-badge.grade-d { color: #d64d00; } /* Orange */
+.canvas-pp-grade-badge.grade-f { color: #d10000; } /* Red */
 
 /* --- Dashboard Card Hover Animation --- */
 .ic-DashboardCard {

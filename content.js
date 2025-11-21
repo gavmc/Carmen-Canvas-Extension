@@ -18,7 +18,6 @@ function waitForPageLoad() {
 }
 
 waitForPageLoad().then(() => {
-    // Small delay to allow React to hydrate
     setTimeout(init, 1000);
 });
 
@@ -26,19 +25,15 @@ waitForPageLoad().then(() => {
 // --- Dashboard Grade Badges ---
 
 const showGrades = async () => {
-    // We use the Canvas API to get enrollments (grades)
-    // This is cleaner than scraping the /grades page HTML
     try {
         const response = await fetch('/api/v1/users/self/enrollments?type[]=StudentEnrollment&state[]=active');
         if (!response.ok) throw new Error('Failed to fetch grades');
         
         const enrollments = await response.json();
-        
-        // Create a map of CourseID -> Score
         const gradeMap = {};
+        
         enrollments.forEach(enrollment => {
             if (enrollment.course_id && enrollment.grades) {
-                // Prefer current_score, fallback to final_score if needed
                 const score = enrollment.grades.current_score;
                 if (score !== null && score !== undefined) {
                     gradeMap[enrollment.course_id] = score;
@@ -57,8 +52,6 @@ const applyGradesToCards = (gradeMap) => {
     const cards = document.querySelectorAll('.ic-DashboardCard');
     
     cards.forEach(card => {
-        // Find the course link to get the ID
-        // Link is usually /courses/123456
         const link = card.querySelector('a.ic-DashboardCard__link');
         if (!link) return;
 
@@ -69,17 +62,22 @@ const applyGradesToCards = (gradeMap) => {
             const courseId = match[1];
             const grade = gradeMap[courseId];
 
-            // If we have a grade, check if we already added a badge, if not, add it
             if (grade !== undefined && !card.querySelector('.canvas-pp-grade-badge')) {
-                const badge = document.createElement('div');
+                // Create a Link instead of just a div
+                const badge = document.createElement('a');
                 badge.className = 'canvas-pp-grade-badge';
-                // Format: 99.5%
                 badge.innerText = `${grade}%`;
+                badge.href = `/courses/${courseId}/grades`; // Direct link to grades
+                
+                // Determine Color Class
+                if (grade >= 90) badge.classList.add('grade-a');
+                else if (grade >= 80) badge.classList.add('grade-b');
+                else if (grade >= 70) badge.classList.add('grade-c');
+                else if (grade >= 60) badge.classList.add('grade-d');
+                else badge.classList.add('grade-f');
 
-                // Append to the header image area so it sits on top of the color
                 const header = card.querySelector('.ic-DashboardCard__header');
                 if (header) {
-                    // Ensure relative positioning for absolute badge
                     header.style.position = 'relative'; 
                     header.appendChild(badge);
                 }
@@ -95,7 +93,6 @@ const fixToDo = () => {
     const rightSide = document.querySelector("#right-side");
     if (!rightSide) return;
 
-    // SAFELY remove logo to prevent crashes
     const logo = rightSide.querySelector(".ic-sidebar-logo");
     if (logo) {
         logo.style.display = 'none'; 
